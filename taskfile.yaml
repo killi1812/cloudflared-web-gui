@@ -15,8 +15,20 @@ tasks:
     desc: "Start app in development mode"
     deps: [generate-swagger]
     cmds:
-      - defer: { task: dc-stop }
       - task: dev-deps
+    silent: true
+    signal: SIGINT
+
+  run:
+    desc: "Start app in prod mode"
+    vars:
+      BUILD: "prod"
+    deps:
+      - task: server-dev
+        vars:
+          BUILD: "{{.BUILD}}"
+      - task: webapp-dev
+    parallel: true
     silent: true
     signal: SIGINT
 
