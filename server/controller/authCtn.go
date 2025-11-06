@@ -60,7 +60,7 @@ func (l *AuthCtn) login(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := l.auth.Login(loginDto.Email, loginDto.Password)
+	accessToken, err := l.auth.Login(loginDto.Username, loginDto.Password)
 	if err != nil {
 		l.logger.Errorf("Login failed err = %+v", err)
 		c.JSON(http.StatusUnauthorized, err.Error())

@@ -5,7 +5,7 @@
 # Variables - You can change these to match your test environment
 @host = http://localhost
 @port = 8090
-@email = superadmin@test.hr
+@username = superadmin
 @password = Pa$$w0rd
 
 ###
@@ -17,7 +17,7 @@ POST {{host}}:{{port}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "{{email}}",
+  "username": "{{username}}",
   "password": "{{password}}"
 }
 # @lang=lua
