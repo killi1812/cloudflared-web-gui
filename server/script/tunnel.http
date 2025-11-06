@@ -36,7 +36,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @name deleteTunnel
-# Deletea a specific tunnel
+# Delete a specific tunnel
 DELETE {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}
 Authorization: Bearer {{accessToken}}
 
