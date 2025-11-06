@@ -3,6 +3,7 @@ version: "3"
 vars:
   BINARY_DIR: ./build
   PACKAGE: "github.com/killi1812/cloudflared-web-gui"
+  BIN: "cldflctn"
   TEST_PCKGS: "./util/* ./controller ./service ./dto "
 
 tasks:
@@ -167,16 +168,47 @@ tasks:
   # |_____________________|
 
   d-build:
-    desc: "build a docker image"
+    desc: "build a docker images"
     vars:
+      BUILD: "prod"
       VERSION:
         sh: git describe --tags --always --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*' 2> /dev/null | sed 's/^.//'
+      COMMIT_HASH:
+        sh: git rev-parse --short HEAD
+      BUILD_TIMESTAMP:
+        sh: date '+%Y-%m-%dT%H:%M:%S'
+      LDFLAGS: "-X '{{.PACKAGE}}/app.Build={{.BUILD}}' -X '{{.PACKAGE}}/app.Version={{.VERSION}}' -X '{{.PACKAGE}}/app.CommitHash={{.COMMIT_HASH}}' -X '{{.PACKAGE}}/app.BuildTimestamp={{.BUILD_TIMESTAMP}}'"
     cmds:
       - cmd: mkdir -p {{.BINARY_DIR}}
-      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} ./
-      - cmd: docker save -o {{.BINARY_DIR}}/{{.PACKAGE}}-{{.VERSION}}.tar {{.PACKAGE}}:latest
+      - task: d-build-server
+        vars:
+          LDFLAGS: "{{.LDFLAGS}}"
+          VERSION: "{{.VERSION}}"
+          BUILD: "{{.BUILD}}"
+      - task: d-build-client
+        vars:
+          VERSION: "{{.VERSION}}"
 
     silent: true
+
+  d-build-server:
+    desc: "build a docker image for server"
+    dir: ./server
+    cmds:
+      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} --build-arg="{{.LDFLAGS}}" ./
+      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-server-{{.VERSION}}.tar {{.PACKAGE}}:latest
+    silent: true
+    internal: true
+
+  d-build-client:
+    desc: "build a docker image for client"
+    dir: ./client
+    vars:
+    cmds:
+      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} ./
+      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-client-{{.VERSION}}.tar {{.PACKAGE}}:latest
+    silent: true
+    internal: true
 
   # _______________________
   # |                     |

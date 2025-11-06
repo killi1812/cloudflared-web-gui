@@ -1,5 +1,3 @@
-# TODO: rework build 
-
 # Stage 2: Build the backend
 FROM golang:1.25 AS builder
 WORKDIR /app
@@ -8,25 +6,22 @@ WORKDIR /app
 RUN go install github.com/go-task/task/v3/cmd/task@latest
 
 # Copy Go module files and download dependencies first for caching
-COPY ./server/go.mod ./server/go.sum ./
-RUN go mod download
+COPY go.mod go.sum ./
 
-# Copy the taskfile so we can use it
-COPY taskfile.yaml .
+RUN go mod download
 
 # Copy the entire server source code
 COPY . .
 
-# Copy the built frontend assets from the 'frontend' stage
-# COPY --from=frontend /app/client/dist ./server/client/dist
+ARG LDFLAGS=""
 
-RUN task build
+RUN go build -ldflags="${LDFLAGS}" .
 
 FROM gcr.io/distroless/static-debian11
 WORKDIR /
 
 # Copy only the compiled binary from the builder stage
-COPY --from=builder ./app/server/build/cloudflared-web-gui /cloudflared-web-gui
+COPY --from=builder ./app/cloudflared-web-gui /cloudflared-web-gui
 
 # Set the entrypoint for the container
 ENTRYPOINT ["/cloudflared-web-gui"]

@@ -7,7 +7,7 @@
     </v-row>
     <v-row class="d-flex justify-center mt-4">
       <v-col cols="12" md="6">
-        <UserStats :user-id="app.user.id" />
+        <UserStats :user-id="app.user.uuid" />
       </v-col>
     </v-row>
   </v-container>
