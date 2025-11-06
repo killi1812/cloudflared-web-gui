@@ -1,4 +1,8 @@
 definitions:
+  controller.domainDto:
+    type: object
+  controller.nameDto:
+    type: object
   dto.LoginDto:
     properties:
       password:
@@ -32,6 +36,17 @@ definitions:
     - role
     - username
     type: object
+  dto.ServerInfoDto:
+    properties:
+      build:
+        type: string
+      buildTimestamp:
+        type: string
+      commitHash:
+        type: string
+      version:
+        type: string
+    type: object
   dto.TokenDto:
     properties:
       accessToken:
@@ -46,6 +61,25 @@ definitions:
       username:
         type: string
       uuid:
+        type: string
+    type: object
+  model.Connection:
+    type: object
+  model.Tunnel:
+    properties:
+      connections:
+        items:
+          $ref: '#/definitions/model.Connection'
+        type: array
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      token:
         type: string
     type: object
 info:
@@ -108,7 +142,7 @@ paths:
         "200":
           description: Information about server
           schema:
-            type: struct
+            $ref: '#/definitions/dto.ServerInfoDto'
       summary: Get server info
       tags:
       - info
@@ -121,7 +155,9 @@ paths:
         "200":
           description: List of tunnels
           schema:
-            type: struct
+            items:
+              $ref: '#/definitions/model.Tunnel'
+            type: array
       summary: Get a list of all tunnels
       tags:
       - tunnel
@@ -133,14 +169,14 @@ paths:
         name: name
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/controller.nameDto'
       produces:
       - application/json
       responses:
         "201":
           description: Newly created tunnel
           schema:
-            type: struct
+            $ref: '#/definitions/model.Tunnel'
       summary: creates a new tunnel
       tags:
       - tunnel
@@ -159,6 +195,49 @@ paths:
         "204":
           description: Tunnel deleted
       summary: Get a list of all tunnels
+      tags:
+      - tunnel
+    post:
+      description: Creates a new dns record on the tunnel
+      parameters:
+      - description: tunnel id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tunnel dns record created
+          schema:
+            $ref: '#/definitions/model.Tunnel'
+      summary: Creates a dns record on the tunnel
+      tags:
+      - tunnel
+  /tunnel/dns/{id}:
+    post:
+      description: Creates a new dns record on the tunnel
+      parameters:
+      - description: tunnel id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: dns domain
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/controller.domainDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tunnel dns record created
+          schema:
+            $ref: '#/definitions/model.Tunnel'
+      summary: Creates a dns record on the tunnel
       tags:
       - tunnel
   /user:

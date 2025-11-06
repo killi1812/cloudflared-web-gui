@@ -103,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Information about server",
                         "schema": {
-                            "type": "struct"
+                            "$ref": "#/definitions/dto.ServerInfoDto"
                         }
                     }
                 }
@@ -123,7 +123,10 @@ const docTemplate = `{
                     "200": {
                         "description": "List of tunnels",
                         "schema": {
-                            "type": "struct"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Tunnel"
+                            }
                         }
                     }
                 }
@@ -144,7 +147,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/controller.nameDto"
                         }
                     }
                 ],
@@ -152,13 +155,78 @@ const docTemplate = `{
                     "201": {
                         "description": "Newly created tunnel",
                         "schema": {
-                            "type": "struct"
+                            "$ref": "#/definitions/model.Tunnel"
+                        }
+                    }
+                }
+            }
+        },
+        "/tunnel/dns/{id}": {
+            "post": {
+                "description": "Creates a new dns record on the tunnel",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "Creates a dns record on the tunnel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tunnel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "dns domain",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.domainDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Tunnel dns record created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Tunnel"
                         }
                     }
                 }
             }
         },
         "/tunnel/{id}": {
+            "post": {
+                "description": "Creates a new dns record on the tunnel",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "Creates a dns record on the tunnel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tunnel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tunnel dns record created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Tunnel"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "returns a list of all tunnels",
                 "produces": [
@@ -480,6 +548,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controller.domainDto": {
+            "type": "object"
+        },
+        "controller.nameDto": {
+            "type": "object"
+        },
         "dto.LoginDto": {
             "type": "object",
             "required": [
@@ -526,6 +600,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ServerInfoDto": {
+            "type": "object",
+            "properties": {
+                "build": {
+                    "type": "string"
+                },
+                "buildTimestamp": {
+                    "type": "string"
+                },
+                "commitHash": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.TokenDto": {
             "type": "object",
             "properties": {
@@ -547,6 +638,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Connection": {
+            "type": "object"
+        },
+        "model.Tunnel": {
+            "type": "object",
+            "properties": {
+                "connections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Connection"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

@@ -12,8 +12,8 @@
 @uuid_to_test = 1f357445-6f3c-490e-a3da-5ed1f18a117a
 
 ###
-# @name createUser
-# Create a new user.
+# @name createTunnel
+# Create a new tunnel
 POST {{host}}:{{port}}/api/tunnel
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
@@ -29,13 +29,31 @@ Authorization: Bearer {{accessToken}}
 
 
 ###
-# @name getMyData
-# Get the data for the currently logged-in user.
+# @name getTunnels
+# Get all tunnels
 GET {{host}}:{{port}}/api/tunnel
 Authorization: Bearer {{accessToken}}
 
 ###
-# @name getUserByUuid
-# Get a specific user by their UUID.
+# @name deleteTunnel
+# Deletea a specific tunnel
 DELETE {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}
+Authorization: Bearer {{accessToken}}
+
+
+###
+# @name createDnsRoute
+# Create a new dns route on the given tunnel
+POST {{host}}:{{port}}/api/tunnel/dns/{{uuid_to_test}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "domain": "test.francvok.from.hr"
+}
+
+###
+# @name getTunnel
+# Get data for given tunnel
+GET {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}
 Authorization: Bearer {{accessToken}}

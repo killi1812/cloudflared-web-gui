@@ -19,9 +19,15 @@ const (
 )
 
 type ITunnelSrv interface {
-	Create(name string) (*model.Tunnel, error)
 	Start(uuid uuid.UUID) (*model.Tunnel, error)
+	Restart(uuid uuid.UUID) (*model.Tunnel, error)
 	Stop(uuid uuid.UUID) (*model.Tunnel, error)
+
+	AddConn(uuid uuid.UUID, domain string) (*model.Tunnel, error)
+	RemoveConn(uuid uuid.UUID) (*model.Tunnel, error)
+
+	Create(name string) (*model.Tunnel, error)
+	Info(uuid uuid.UUID) (*model.Tunnel, error)
 	List() ([]model.Tunnel, error)
 	Delete(uuid uuid.UUID) error
 }
@@ -43,6 +49,68 @@ type TunelSrv struct {
 	logger *zap.SugaredLogger
 }
 
+// Info implements ITunnelSrv.
+func (t TunelSrv) Info(uuid uuid.UUID) (*model.Tunnel, error) {
+	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, "info", _OUTPUT, uuid.String())
+	data, err := cmd.Output()
+	if err != nil {
+		checkErr(err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
+		return nil, err
+	}
+
+	var tunnel model.Tunnel
+	err = json.NewDecoder(bytes.NewReader(data)).Decode(&tunnel)
+	if err != nil {
+		t.logger.Errorf("Error decoding data, err = %w", err)
+		return nil, err
+	}
+
+	return &tunnel, nil
+}
+
+// AddConn implements ITunnelSrv.
+// runs and parses ❯ cloudflared tunnel route dns [uuid] [domain]
+func (t TunelSrv) AddConn(uuid uuid.UUID, domain string) (*model.Tunnel, error) {
+	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, "route", "dns", uuid.String(), domain)
+
+	err := cmd.Run()
+	if err != nil {
+		checkErr(err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
+		return nil, err
+	}
+
+	tunnel, err := t.Info(uuid)
+	if err != nil {
+		t.logger.Errorf("Error retriving information about the tunnel, err = %v", err)
+		return nil, err
+	}
+
+	return tunnel, nil
+}
+
+// RemoveConn implements ITunnelSrv.
+func (t TunelSrv) RemoveConn(uuid uuid.UUID) (*model.Tunnel, error) {
+	// TODO: see with cloudflared api
+	panic("unimplemented")
+}
+
+// Restart implements ITunnelSrv.
+func (t TunelSrv) Restart(uuid uuid.UUID) (*model.Tunnel, error) {
+	panic("unimplemented")
+}
+
+// Start implements ITunnelSrv.
+func (t TunelSrv) Start(uuid uuid.UUID) (*model.Tunnel, error) {
+	panic("unimplemented")
+}
+
+// Stop implements ITunnelSrv.
+func (t TunelSrv) Stop(uuid uuid.UUID) (*model.Tunnel, error) {
+	panic("unimplemented")
+}
+
 // Create implements ITunnelSrv.
 // runs and parses ❯ cloudflared tunnel create [name]
 func (t TunelSrv) Create(name string) (*model.Tunnel, error) {
@@ -50,7 +118,7 @@ func (t TunelSrv) Create(name string) (*model.Tunnel, error) {
 	data, err := cmd.Output()
 	if err != nil {
 		checkErr(err)
-		t.logger.Errorf("Error running the command,err = %w", err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
 		return nil, err
 	}
 
@@ -70,7 +138,7 @@ func (t TunelSrv) Delete(uuid uuid.UUID) error {
 	err := cmd.Run()
 	if err != nil {
 		checkErr(err)
-		t.logger.Errorf("Error running the command,err = %w", err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
 		return err
 	}
 
@@ -84,7 +152,7 @@ func (t TunelSrv) List() ([]model.Tunnel, error) {
 	data, err := cmd.Output()
 	if err != nil {
 		checkErr(err)
-		t.logger.Errorf("Error running the command,err = %w", err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
 		return nil, err
 	}
 
@@ -96,16 +164,6 @@ func (t TunelSrv) List() ([]model.Tunnel, error) {
 	}
 
 	return list, nil
-}
-
-// Start implements ITunnelSrv.
-func (t TunelSrv) Start(uuid uuid.UUID) (*model.Tunnel, error) {
-	panic("unimplemented")
-}
-
-// Stop implements ITunnelSrv.
-func (t TunelSrv) Stop(uuid uuid.UUID) (*model.Tunnel, error) {
-	panic("unimplemented")
 }
 
 func checkErr(err error) {

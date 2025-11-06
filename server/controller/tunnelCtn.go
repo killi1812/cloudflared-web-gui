@@ -12,6 +12,13 @@ import (
 	"go.uber.org/zap"
 )
 
+type (
+	nameDto   struct{ name string }
+	domainDto struct {
+		Domain string `json:"domain" binding:"required`
+	}
+)
+
 type TunnelCtn struct {
 	Logger    *zap.SugaredLogger
 	TunnelSrv service.ITunnelSrv
@@ -34,7 +41,11 @@ func (cnt *TunnelCtn) RegisterEndpoints(router *gin.RouterGroup) {
 	grp := router.Group("/tunnel", auth.Protect())
 	grp.GET("", cnt.getTunnels)
 	grp.POST("", cnt.createTunnel)
+
 	grp.DELETE("/:id", cnt.deleteTunnel)
+	grp.GET("/:id", cnt.getInfo)
+
+	grp.POST("/dns/:id", cnt.createDnsRecord)
 }
 
 // getTunnels godoc
@@ -43,7 +54,7 @@ func (cnt *TunnelCtn) RegisterEndpoints(router *gin.RouterGroup) {
 //	@Description	returns a list of all tunnels
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		200	{struct}	[]model.Tunnel	"List of tunnels"
+//	@Success		200	{object}	[]model.Tunnel	"List of tunnels"
 //	@Router			/tunnel [get]
 func (ctn *TunnelCtn) getTunnels(c *gin.Context) {
 	list, err := ctn.TunnelSrv.List()
@@ -62,11 +73,11 @@ func (ctn *TunnelCtn) getTunnels(c *gin.Context) {
 //	@Description	creates a new tunnel with given name and returns it
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		201		{struct}	model.Tunnel	"Newly created tunnel"
-//	@Param			name	body		string			true	"tunnel name"
+//	@Success		201		{object}	model.Tunnel	"Newly created tunnel"
+//	@Param			name	body		nameDto			true	"tunnel name"
 //	@Router			/tunnel [post]
 func (ctn *TunnelCtn) createTunnel(c *gin.Context) {
-	var req struct{ name string }
+	var req nameDto
 
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -117,4 +128,82 @@ func (ctn *TunnelCtn) deleteTunnel(c *gin.Context) {
 	}
 
 	c.AbortWithStatus(http.StatusNoContent)
+}
+
+// createDnsRecord godoc
+//
+//	@Summary		Creates a dns record on the tunnel
+//	@Description	Creates a new dns record on the tunnel
+//	@Tags			tunnel
+//	@Produce		json
+//	@Success		201	{object}	model.Tunnel	"Tunnel dns record created"
+//	@Param			id	path		string			true	"tunnel id"
+//	@Param			id	body		domainDto		true	"dns domain"
+//	@Router			/tunnel/dns/{id} [post]
+func (ctn *TunnelCtn) createDnsRecord(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		ctn.Logger.Error("Error id not found in a form")
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctn.Logger.Errorf("Error parsing uuid, id = %s", id)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	var req domainDto
+	err = c.BindJSON(&req)
+	if err != nil {
+		ctn.Logger.Errorf("Error body format, err = %v", err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	ctn.Logger.Debugf("req: %+v", req)
+
+	tunnel, err := ctn.TunnelSrv.AddConn(uuid, req.Domain)
+	if err != nil {
+		ctn.Logger.Errorf("Error deleting a tunnel, err = %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.AbortWithStatusJSON(http.StatusCreated, tunnel)
+}
+
+// getInfo godoc
+//
+//	@Summary		Creates a dns record on the tunnel
+//	@Description	Creates a new dns record on the tunnel
+//	@Tags			tunnel
+//	@Produce		json
+//	@Success		200	{object}	model.Tunnel	"Tunnel dns record created"
+//	@Param			id	path		string			true	"tunnel id"
+//	@Router			/tunnel/{id} [get]
+func (ctn *TunnelCtn) getInfo(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		ctn.Logger.Error("Error id not found in a form")
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctn.Logger.Errorf("Error parsing uuid, id = %s", id)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	tunnel, err := ctn.TunnelSrv.Info(uuid)
+	if err != nil {
+		ctn.Logger.Errorf("Error deleting a tunnel, err = %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.AbortWithStatusJSON(http.StatusOK, tunnel)
 }
