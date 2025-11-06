@@ -102,7 +102,46 @@ func (t *TunnelSrv) RemoveConn(uuid uuid.UUID) (*model.Tunnel, error) {
 
 // Restart implements ITunnelSrv.
 func (t *TunnelSrv) Restart(uuid uuid.UUID) error {
-	panic("unimplemented")
+	t.logger.Infof("Starting restart procedure for tunnel %s", uuid.String())
+
+	oldProc, ok := t.tunnelProc[uuid]
+	if !ok {
+		zap.S().Infof("Tunnel uuid = %s isn't running", uuid)
+		return errors.New("tunnel not running")
+	}
+
+	t.logger.Infof("Old process found, pid = %d", oldProc.Pid)
+	t.logger.Infoln("Starting new process")
+
+	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, _OUTPUT, "run", uuid.String())
+	err := cmd.Start()
+	if err != nil {
+		checkErr(err)
+		t.logger.Errorf("Error running the command = %s, err = %w", cmd.String(), err)
+		return err
+	}
+
+	t.logger.Infof("New process started, pid = %d", cmd.Process.Pid)
+	t.logger.Infof("Stopping old process, pid = %d", oldProc.Pid)
+
+	err = oldProc.Kill()
+	if err != nil {
+		t.logger.Errorf("Failed to kill process = %+v, err = %v", *oldProc, err)
+		return err
+	}
+
+	_, err = oldProc.Wait()
+	if err != nil {
+		t.logger.Errorf("Failed to Wait for process = %+v, err = %v", *oldProc, err)
+		return err
+	}
+
+	t.logger.Infof("Old process stopped, pid = %d", oldProc.Pid)
+
+	t.tunnelProc[uuid] = cmd.Process
+
+	t.logger.Infoln("Restart procedure done")
+	return nil
 }
 
 // Start implements ITunnelSrv.
@@ -130,19 +169,19 @@ func (t *TunnelSrv) Start(uuid uuid.UUID) error {
 func (t *TunnelSrv) Stop(uuid uuid.UUID) error {
 	proc, ok := t.tunnelProc[uuid]
 	if !ok {
-		t.logger.Errorf("Procces running a tunnel %s not found", uuid.String())
-		return errors.New("Procces not found")
+		t.logger.Errorf("process running a tunnel %s not found", uuid.String())
+		return errors.New("process not found")
 	}
 
 	err := proc.Kill()
 	if err != nil {
-		t.logger.Errorf("Failed to kill procces = %+v, err = %v", *proc, err)
+		t.logger.Errorf("Failed to kill process = %+v, err = %v", *proc, err)
 		return err
 	}
 
 	_, err = proc.Wait()
 	if err != nil {
-		t.logger.Errorf("Failed to Wait for procces = %+v, err = %v", *proc, err)
+		t.logger.Errorf("Failed to Wait for process = %+v, err = %v", *proc, err)
 		return err
 	}
 
