@@ -2,11 +2,9 @@ package dto
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/killi1812/cloudflared-web-gui/model"
 	"github.com/killi1812/cloudflared-web-gui/util/cerror"
-	"github.com/killi1812/cloudflared-web-gui/util/format"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -14,12 +12,7 @@ import (
 
 type UserDto struct {
 	Uuid        string `json:"uuid"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	OIB         string `json:"oib"`
-	Residence   string `json:"residence"`
-	BirthDate   string `json:"birthDate"`
-	Email       string `json:"email"`
+	Username    string `json:"username"`
 	Role        string `json:"role"`
 	PoliceToken string `json:"policeToken"`
 }
@@ -31,12 +24,6 @@ func (dto UserDto) ToModel() (*model.User, error) {
 		return nil, cerror.ErrBadUuid
 	}
 
-	bod, err := time.Parse(format.DateFormat, dto.BirthDate)
-	if err != nil {
-		zap.S().Errorf("Failed to parse BirthDate = %s, err = %+v", dto.BirthDate, err)
-		return nil, cerror.ErrBadDateFormat
-	}
-
 	role, err := model.StrToUserRole(dto.Role)
 	if err != nil {
 		zap.S().Errorf("Failed to parse role = %+v, err = %+v", dto.Role, err)
@@ -44,28 +31,16 @@ func (dto UserDto) ToModel() (*model.User, error) {
 	}
 
 	return &model.User{
-		Uuid:      uuid,
-		FirstName: dto.FirstName,
-		LastName:  dto.LastName,
-		OIB:       dto.OIB,
-		Residence: dto.Residence,
-		BirthDate: bod,
-		Email:     dto.Email,
-		Role:      role,
+		Uuid: uuid,
+		Role: role,
 	}, nil
 }
 
 // FromModel returns a dto from model struct
 func (UserDto) FromModel(m *model.User) UserDto {
 	dto := &UserDto{
-		Uuid:      m.Uuid.String(),
-		FirstName: m.FirstName,
-		LastName:  m.LastName,
-		OIB:       m.OIB,
-		Residence: m.Residence,
-		BirthDate: m.BirthDate.Format(format.DateFormat),
-		Email:     m.Email,
-		Role:      fmt.Sprint(m.Role),
+		Uuid: m.Uuid.String(),
+		Role: fmt.Sprint(m.Role),
 	}
 	return *dto
 }

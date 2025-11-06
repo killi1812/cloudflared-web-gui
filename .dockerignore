@@ -40,3 +40,5 @@ tmp/
 .vscode/
 .idea/
 *.tar
+
+server/db.sqlite

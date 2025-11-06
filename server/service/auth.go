@@ -15,7 +15,7 @@ import (
 )
 
 type IAuthService interface {
-	Login(email, password string) (string, error)
+	Login(username, password string) (string, error)
 	RefreshTokens(accessToken string) (string, error)
 	Logout(userUuid string) error
 }
@@ -38,11 +38,11 @@ func NewAuthService() IAuthService {
 	return service
 }
 
-func (s *AuthService) Login(email, password string) (string, error) {
+func (s *AuthService) Login(username, password string) (string, error) {
 	var user model.User
-	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := s.db.Where("username = ?", username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			s.logger.Debugf("User not found Email = %s", email)
+			s.logger.Debugf("User not found username = %s", username)
 			return "", cerror.ErrInvalidCredentials
 		}
 
@@ -51,7 +51,7 @@ func (s *AuthService) Login(email, password string) (string, error) {
 	}
 
 	if !auth.VerifyPassword(user.PasswordHash, password) {
-		s.logger.Debugf("Invalid password for user Email: %s, uuid: %s", user.Email, user.Uuid)
+		s.logger.Debugf("Invalid password for user: %s, uuid: %s", user.Username, user.Uuid)
 		return "", cerror.ErrInvalidCredentials
 	}
 

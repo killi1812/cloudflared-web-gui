@@ -59,7 +59,7 @@ func (suite *authTestSuite) SetupSuite() {
 
 	user := model.User{
 		Uuid:         uuid.New(),
-		Email:        "test@example.com",
+		Username:     "test",
 		PasswordHash: hashedPassword,
 		Role:         model.ROLE_USER,
 	}
@@ -89,7 +89,7 @@ func TestAuthTestSuite(t *testing.T) {
 
 func (suite *authTestSuite) TestLogin_Success() {
 	// Act
-	accessToken, err := suite.authService.Login(suite.seededUser.Email, suite.seededRawPass)
+	accessToken, err := suite.authService.Login(suite.seededUser.Username, suite.seededRawPass)
 
 	// Assert
 	suite.NoError(err)
@@ -113,7 +113,7 @@ func (suite *authTestSuite) TestLogin_UserNotFound() {
 
 func (suite *authTestSuite) TestLogin_InvalidPassword() {
 	// Act
-	accessToken, err := suite.authService.Login(suite.seededUser.Email, "wrongpassword")
+	accessToken, err := suite.authService.Login(suite.seededUser.Username, "wrongpassword")
 
 	// Assert
 	suite.ErrorIs(err, cerror.ErrInvalidCredentials)
@@ -122,7 +122,7 @@ func (suite *authTestSuite) TestLogin_InvalidPassword() {
 
 func (suite *authTestSuite) TestLogin_ExistingSessionIsReplaced() {
 	// Arrange: Log the user in once to create a session
-	_, err := suite.authService.Login(suite.seededUser.Email, suite.seededRawPass)
+	_, err := suite.authService.Login(suite.seededUser.Username, suite.seededRawPass)
 	suite.Require().NoError(err)
 
 	var firstSession model.Session
@@ -130,7 +130,7 @@ func (suite *authTestSuite) TestLogin_ExistingSessionIsReplaced() {
 	suite.Require().NotEmpty(firstSession.RefreshToken)
 
 	// Act: Log the user in a second time
-	_, err = suite.authService.Login(suite.seededUser.Email, suite.seededRawPass)
+	_, err = suite.authService.Login(suite.seededUser.Username, suite.seededRawPass)
 	suite.Require().NoError(err)
 
 	// Assert: Check that the session has been updated
@@ -142,7 +142,7 @@ func (suite *authTestSuite) TestLogin_ExistingSessionIsReplaced() {
 
 func (suite *authTestSuite) TestLogout_Success() {
 	// Arrange: Log in to create a session
-	_, err := suite.authService.Login(suite.seededUser.Email, suite.seededRawPass)
+	_, err := suite.authService.Login(suite.seededUser.Username, suite.seededRawPass)
 	suite.Require().NoError(err)
 
 	// Act
@@ -159,7 +159,7 @@ func (suite *authTestSuite) TestLogout_Success() {
 
 func (suite *authTestSuite) TestRefreshTokens_Success() {
 	// Arrange: Log in to get a valid token and create a session
-	originalAccessToken, err := suite.authService.Login(suite.seededUser.Email, suite.seededRawPass)
+	originalAccessToken, err := suite.authService.Login(suite.seededUser.Username, suite.seededRawPass)
 	suite.Require().NoError(err)
 	suite.Require().NotEmpty(originalAccessToken)
 

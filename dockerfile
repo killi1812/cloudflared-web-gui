@@ -1,4 +1,4 @@
-# TODO: add building for frontend
+# TODO: rework build 
 
 # Stage 2: Build the backend
 FROM golang:1.25 AS builder
@@ -26,8 +26,8 @@ FROM gcr.io/distroless/static-debian11
 WORKDIR /
 
 # Copy only the compiled binary from the builder stage
-COPY --from=builder ./app/server/build/template /template
+COPY --from=builder ./app/server/build/cloudflared-web-gui /cloudflared-web-gui
 
 # Set the entrypoint for the container
-ENTRYPOINT ["/template"]
+ENTRYPOINT ["/cloudflared-web-gui"]
 

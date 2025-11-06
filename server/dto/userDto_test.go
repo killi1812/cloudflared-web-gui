@@ -2,12 +2,10 @@ package dto_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/killi1812/cloudflared-web-gui/dto"
 	"github.com/killi1812/cloudflared-web-gui/model"
 	"github.com/killi1812/cloudflared-web-gui/util/cerror"
-	"github.com/killi1812/cloudflared-web-gui/util/format"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -15,8 +13,6 @@ import (
 
 func TestUserDto_ToModel(t *testing.T) {
 	validUUID := uuid.New()
-	validDateStr := "1990-01-15"
-	validTime, _ := time.Parse(format.DateFormat, validDateStr)
 
 	tests := []struct {
 		name    string
@@ -27,59 +23,29 @@ func TestUserDto_ToModel(t *testing.T) {
 		{
 			name: "Valid DTO to Model",
 			dto: dto.UserDto{
-				Uuid:      validUUID.String(),
-				FirstName: "John",
-				LastName:  "Doe",
-				OIB:       "12345678901",
-				Residence: "123 Main St",
-				BirthDate: validDateStr,
-				Email:     "john.doe@example.com",
-				Role:      "user",
+				Uuid: validUUID.String(),
+				Role: "user",
 			},
 			want: &model.User{
-				Uuid:      validUUID,
-				FirstName: "John",
-				LastName:  "Doe",
-				OIB:       "12345678901",
-				Residence: "123 Main St",
-				BirthDate: validTime,
-				Email:     "john.doe@example.com",
-				Role:      model.ROLE_USER,
+				Uuid: validUUID,
+				Role: model.ROLE_USER,
 			},
 			wantErr: nil,
 		},
 		{
 			name: "Invalid UUID",
 			dto: dto.UserDto{
-				Uuid:      "not-a-uuid",
-				FirstName: "Jane",
-				LastName:  "Doe",
-				Role:      "firma",
-				BirthDate: validDateStr,
+				Uuid: "not-a-uuid",
+				Role: "firma",
 			},
 			want:    nil,
 			wantErr: cerror.ErrBadUuid,
 		},
 		{
-			name: "Invalid BirthDate format",
-			dto: dto.UserDto{
-				Uuid:      validUUID.String(),
-				FirstName: "Jim",
-				LastName:  "Beam",
-				BirthDate: "15-01-1990", // Wrong format
-				Role:      "hak",
-			},
-			want:    nil,
-			wantErr: cerror.ErrBadDateFormat,
-		},
-		{
 			name: "Invalid Role",
 			dto: dto.UserDto{
-				Uuid:      validUUID.String(),
-				FirstName: "Jack",
-				LastName:  "Daniels",
-				BirthDate: validDateStr,
-				Role:      "invalid_role",
+				Uuid: validUUID.String(),
+				Role: "invalid_role",
 			},
 			want:    nil,
 			wantErr: cerror.ErrUnknownRole,
@@ -96,12 +62,6 @@ func TestUserDto_ToModel(t *testing.T) {
 				assert.NoError(t, err)
 				// Compare individual fields as GORM Model has unexported fields
 				assert.Equal(t, tt.want.Uuid, got.Uuid)
-				assert.Equal(t, tt.want.FirstName, got.FirstName)
-				assert.Equal(t, tt.want.LastName, got.LastName)
-				assert.Equal(t, tt.want.OIB, got.OIB)
-				assert.Equal(t, tt.want.Residence, got.Residence)
-				assert.Equal(t, tt.want.BirthDate, got.BirthDate)
-				assert.Equal(t, tt.want.Email, got.Email)
 				assert.Equal(t, tt.want.Role, got.Role)
 			}
 		})
@@ -110,27 +70,14 @@ func TestUserDto_ToModel(t *testing.T) {
 
 func TestUserDto_FromModel(t *testing.T) {
 	userUUID := uuid.New()
-	birthTime, _ := time.Parse(format.DateFormat, "1985-07-20")
 	userModel := &model.User{
-		Uuid:      userUUID,
-		FirstName: "Alice",
-		LastName:  "Smith",
-		OIB:       "09876543210",
-		Residence: "456 Oak Ave",
-		BirthDate: birthTime,
-		Email:     "alice.smith@example.com",
-		Role:      model.ROLE_USER,
+		Uuid: userUUID,
+		Role: model.ROLE_USER,
 	}
 
 	expectedDto := dto.UserDto{
-		Uuid:      userUUID.String(),
-		FirstName: "Alice",
-		LastName:  "Smith",
-		OIB:       "09876543210",
-		Residence: "456 Oak Ave",
-		BirthDate: "1985-07-20",
-		Email:     "alice.smith@example.com",
-		Role:      string(model.ROLE_USER),
+		Uuid: userUUID.String(),
+		Role: string(model.ROLE_USER),
 	}
 
 	var gotDto dto.UserDto

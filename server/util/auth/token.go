@@ -50,7 +50,6 @@ func GenerateTokens(user *model.User) (string, string, error) {
 	}
 	uuidPair := uuid.New()
 	accessTokenClaims := &Claims{
-		Email:     user.Email,
 		Username:  user.Username,
 		Role:      user.Role,
 		TokenUuid: uuidPair,
@@ -68,7 +67,6 @@ func GenerateTokens(user *model.User) (string, string, error) {
 
 	refreshTokenClaims := &Claims{
 		Username:  user.Username,
-		Email:     user.Email,
 		Role:      user.Role,
 		TokenUuid: uuidPair,
 		RegisteredClaims: jwt.RegisteredClaims{

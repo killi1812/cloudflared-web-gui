@@ -45,13 +45,13 @@ func (u *UserCtn) RegisterEndpoints(api *gin.RouterGroup) {
 
 	// register Endpoints
 	group.Use(auth.Protect(model.ROLE_SUPER_ADMIN, model.ROLE_ADMIN))
-	group.POST("/", u.create)
-	group.GET("/:uuid", u.get)
+	// group.POST("/", u.create)
+	// group.GET("/:uuid", u.get)
 	group.PUT("/:uuid", u.update)
-	group.DELETE("/:uuid", u.delete)
-	group.GET("/oib/:oib", u.getUserByOib)
-	group.GET("/all-users", u.getAllUsersForSuperAdmin)
-	group.GET("/search", u.searchUsersByName)
+	// group.DELETE("/:uuid", u.delete)
+	// group.GET("/oib/:oib", u.getUserByOib)
+	// group.GET("/all-users", u.getAllUsersForSuperAdmin)
+	// group.GET("/search", u.searchUsersByName)
 }
 
 // UserExample godoc

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/killi1812/cloudflared-web-gui/app"
 	"github.com/killi1812/cloudflared-web-gui/model"
@@ -73,12 +72,6 @@ func (u *UserCrudService) Delete(_uuid uuid.UUID) error {
 	}
 
 	user.Username = fmt.Sprintf("deleted_user_%s", _uuid.String())
-	user.FirstName = "Deleted"
-	user.LastName = "User"
-	user.OIB = fmt.Sprintf("000000%05d", user.ID)
-	user.BirthDate = time.Time{}
-	user.Residence = "Anonymized"
-	user.Email = fmt.Sprintf("deleted_%s@example.com", _uuid.String())
 	user.PasswordHash = ""
 
 	saveRez := u.db.Save(&user)
@@ -170,8 +163,8 @@ func (u *UserCrudService) SearchUsersByName(query string) ([]model.User, error) 
 
 	var scoredUsers []UserWithScore
 	for _, user := range users {
-		fullName := strings.ToLower(user.FirstName + " " + user.LastName)
-		score := smetrics.JaroWinkler(normalizedQuery, fullName, 0.7, 4)
+		username := strings.ToLower(user.Username)
+		score := smetrics.JaroWinkler(normalizedQuery, username, 0.7, 4)
 		scoredUsers = append(scoredUsers, UserWithScore{User: user, Score: score})
 	}
 

@@ -14,7 +14,6 @@ import (
 
 const (
 	_PASSWORD_ENV = "SUPERADMIN_PASSWORD"
-	_OIB          = "11111111111"
 )
 
 var suadmin *model.User
@@ -28,7 +27,7 @@ func createSuperAdmin() error {
 
 	// Check if SuperAdmin exists
 	{
-		_, err := userCrud.GetUserByOIB(_OIB)
+		_, err := userCrud.SearchUsersByName("superadmin")
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				zap.S().Infof("SuperAdmin not found, err %+v", err)
@@ -52,14 +51,9 @@ func createSuperAdmin() error {
 	}
 
 	dto := dto.NewUserDto{
-		Username:  "superadmin",
-		FirstName: "Super",
-		LastName:  "Admin",
-		Email:     "superadmin@test.hr",
-		Password:  password,
-		BirthDate: "2000-01-01",
-		Role:      "superadmin",
-		OIB:       _OIB,
+		Username: "superadmin",
+		Password: password,
+		Role:     "superadmin",
 	}
 	newUser, err := dto.ToModel()
 	if err != nil {
