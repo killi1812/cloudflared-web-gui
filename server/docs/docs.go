@@ -200,7 +200,7 @@ const docTemplate = `{
             }
         },
         "/tunnel/{id}": {
-            "post": {
+            "get": {
                 "description": "Creates a new dns record on the tunnel",
                 "produces": [
                     "application/json"
@@ -248,6 +248,58 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "Tunnel deleted"
+                    }
+                }
+            }
+        },
+        "/tunnel/{id}/restart": {
+            "put": {
+                "description": "restarts a tunnel with zero downtime",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "restarts a tunnel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tunnel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tunnel restarted"
+                    }
+                }
+            }
+        },
+        "/tunnel/{id}/start": {
+            "put": {
+                "description": "stops a tunnel running as system proccess",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "stops a tunnel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tunnel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tunnel stopped"
                     }
                 }
             }
@@ -549,7 +601,12 @@ const docTemplate = `{
     },
     "definitions": {
         "controller.domainDto": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                }
+            }
         },
         "controller.nameDto": {
             "type": "object"

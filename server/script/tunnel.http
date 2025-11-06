@@ -57,3 +57,22 @@ Authorization: Bearer {{accessToken}}
 # Get data for given tunnel
 GET {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}
 Authorization: Bearer {{accessToken}}
+
+###
+# @name startTunnel
+# Starts a tunnel as system process
+PUT {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}/start
+Authorization: Bearer {{accessToken}}
+
+###
+# @name stopTunnel
+# Stops a tunnel running as system process
+PUT {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}/stop
+Authorization: Bearer {{accessToken}}
+
+
+###
+# @name restartTunnel
+# Restarts a running tunnel with zero downtime
+PUT {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}/restart
+Authorization: Bearer {{accessToken}}

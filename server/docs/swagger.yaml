@@ -1,5 +1,8 @@
 definitions:
   controller.domainDto:
+    properties:
+      domain:
+        type: string
     type: object
   controller.nameDto:
     type: object
@@ -197,7 +200,7 @@ paths:
       summary: Get a list of all tunnels
       tags:
       - tunnel
-    post:
+    get:
       description: Creates a new dns record on the tunnel
       parameters:
       - description: tunnel id
@@ -213,6 +216,40 @@ paths:
           schema:
             $ref: '#/definitions/model.Tunnel'
       summary: Creates a dns record on the tunnel
+      tags:
+      - tunnel
+  /tunnel/{id}/restart:
+    put:
+      description: restarts a tunnel with zero downtime
+      parameters:
+      - description: tunnel id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Tunnel restarted
+      summary: restarts a tunnel
+      tags:
+      - tunnel
+  /tunnel/{id}/start:
+    put:
+      description: stops a tunnel running as system proccess
+      parameters:
+      - description: tunnel id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Tunnel stopped
+      summary: stops a tunnel
       tags:
       - tunnel
   /tunnel/dns/{id}:

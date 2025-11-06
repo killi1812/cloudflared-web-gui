@@ -46,6 +46,10 @@ func (cnt *TunnelCtn) RegisterEndpoints(router *gin.RouterGroup) {
 	grp.GET("/:id", cnt.getInfo)
 
 	grp.POST("/dns/:id", cnt.createDnsRecord)
+
+	grp.PUT("/:id/start", cnt.startTunnel)
+	grp.PUT("/:id/stop", cnt.stopTunnel)
+	grp.PUT("/:id/restart", cnt.restartTunnel)
 }
 
 // getTunnels godoc
@@ -206,4 +210,106 @@ func (ctn *TunnelCtn) getInfo(c *gin.Context) {
 	}
 
 	c.AbortWithStatusJSON(http.StatusOK, tunnel)
+}
+
+// startTunnel godoc
+//
+//	@Summary		starts a tunnel
+//	@Description	starts a tunnel as system proccess
+//	@Tags			tunnel
+//	@Produce		json
+//	@Success		204	"Tunnel started"
+//	@Param			id	path	string	true	"tunnel id"
+//	@Router			/tunnel/{id}/start [put]
+func (ctn *TunnelCtn) startTunnel(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		ctn.Logger.Error("Error id not found in a form")
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctn.Logger.Errorf("Error parsing uuid, id = %s", id)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctn.TunnelSrv.Start(uuid)
+	if err != nil {
+		ctn.Logger.Errorf("Error starting a tunnel, err = %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.AbortWithStatus(http.StatusNoContent)
+}
+
+// stopTunnel godoc
+//
+//	@Summary		stops a tunnel
+//	@Description	stops a tunnel running as system proccess
+//	@Tags			tunnel
+//	@Produce		json
+//	@Success		204	"Tunnel stopped"
+//	@Param			id	path	string	true	"tunnel id"
+//	@Router			/tunnel/{id}/start [put]
+func (ctn *TunnelCtn) stopTunnel(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		ctn.Logger.Error("Error id not found in a form")
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctn.Logger.Errorf("Error parsing uuid, id = %s", id)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctn.TunnelSrv.Stop(uuid)
+	if err != nil {
+		ctn.Logger.Errorf("Error stopping a tunnel, err = %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.AbortWithStatus(http.StatusNoContent)
+}
+
+// restartTunnel godoc
+//
+//	@Summary		restarts a tunnel
+//	@Description	restarts a tunnel with zero downtime
+//	@Tags			tunnel
+//	@Produce		json
+//	@Success		204	"Tunnel restarted"
+//	@Param			id	path	string	true	"tunnel id"
+//	@Router			/tunnel/{id}/restart [put]
+func (ctn *TunnelCtn) restartTunnel(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		ctn.Logger.Error("Error id not found in a form")
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		ctn.Logger.Errorf("Error parsing uuid, id = %s", id)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = ctn.TunnelSrv.Restart(uuid)
+	if err != nil {
+		ctn.Logger.Errorf("Error stopping a tunnel, err = %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.AbortWithStatus(http.StatusNoContent)
 }
