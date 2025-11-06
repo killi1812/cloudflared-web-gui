@@ -44,7 +44,6 @@
 </template>
 
 <script setup lang="ts">
-import { DiscordSDK } from "@discord/embedded-app-sdk";
 
 const links = [
   {

@@ -85,7 +85,7 @@ export default defineConfig({
   },
   server: {
     port: 8091,
-    allowedHosts: ['.trycloudflare.com'],
+    allowedHosts: ['.francvok.from.hr'],
     proxy: {
       '/api': {
         target: 'http://localhost:8090',

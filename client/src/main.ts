@@ -15,12 +15,10 @@ import { createApp } from 'vue'
 
 // Styles
 import '@/styles/style.css'
-import { setupDiscordSdk } from './plugins/discord'
 
 const app = createApp(App)
 
 registerPlugins(app)
 
-await setupDiscordSdk(app)
 
 app.mount('#app')

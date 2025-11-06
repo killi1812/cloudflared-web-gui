@@ -19,11 +19,8 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
-    '/game/game': RouteRecordInfo<'/game/game', '/game/game', Record<never, never>, Record<never, never>>,
-    '/game/lobby': RouteRecordInfo<'/game/lobby', '/game/lobby', Record<never, never>, Record<never, never>>,
     '/help/about': RouteRecordInfo<'/help/about', '/help/about', Record<never, never>, Record<never, never>>,
     '/help/help': RouteRecordInfo<'/help/help', '/help/help', Record<never, never>, Record<never, never>>,
-    '/help/test': RouteRecordInfo<'/help/test', '/help/test', Record<never, never>, Record<never, never>>,
     '/me/myProfile': RouteRecordInfo<'/me/myProfile', '/me/myProfile', Record<never, never>, Record<never, never>>,
   }
 
@@ -42,24 +39,12 @@ declare module 'vue-router/auto-routes' {
       routes: '/'
       views: never
     }
-    'src/pages/game/game.vue': {
-      routes: '/game/game'
-      views: never
-    }
-    'src/pages/game/lobby.vue': {
-      routes: '/game/lobby'
-      views: never
-    }
     'src/pages/help/about.vue': {
       routes: '/help/about'
       views: never
     }
     'src/pages/help/help.vue': {
       routes: '/help/help'
-      views: never
-    }
-    'src/pages/help/test.vue': {
-      routes: '/help/test'
       views: never
     }
     'src/pages/me/myProfile.vue': {

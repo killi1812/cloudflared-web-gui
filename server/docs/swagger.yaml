@@ -12,25 +12,8 @@ definitions:
     type: object
   dto.NewUserDto:
     properties:
-      birthDate:
-        type: string
-      email:
-        type: string
-      firstName:
-        maxLength: 100
-        minLength: 2
-        type: string
-      lastName:
-        maxLength: 100
-        minLength: 2
-        type: string
-      oib:
-        type: string
       password:
         minLength: 6
-        type: string
-      residence:
-        maxLength: 255
         type: string
       role:
         enum:
@@ -45,13 +28,7 @@ definitions:
       uuid:
         type: string
     required:
-    - birthDate
-    - email
-    - firstName
-    - lastName
-    - oib
     - password
-    - residence
     - role
     - username
     type: object
@@ -62,21 +39,11 @@ definitions:
     type: object
   dto.UserDto:
     properties:
-      birthDate:
-        type: string
-      email:
-        type: string
-      firstName:
-        type: string
-      lastName:
-        type: string
-      oib:
-        type: string
       policeToken:
         type: string
-      residence:
-        type: string
       role:
+        type: string
+      username:
         type: string
       uuid:
         type: string

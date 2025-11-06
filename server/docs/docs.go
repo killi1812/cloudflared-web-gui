@@ -424,43 +424,14 @@ const docTemplate = `{
         "dto.NewUserDto": {
             "type": "object",
             "required": [
-                "birthDate",
-                "email",
-                "firstName",
-                "lastName",
-                "oib",
                 "password",
-                "residence",
                 "role",
                 "username"
             ],
             "properties": {
-                "birthDate": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                },
-                "lastName": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 2
-                },
-                "oib": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string",
                     "minLength": 6
-                },
-                "residence": {
-                    "type": "string",
-                    "maxLength": 255
                 },
                 "role": {
                     "type": "string",
@@ -491,28 +462,13 @@ const docTemplate = `{
         "dto.UserDto": {
             "type": "object",
             "properties": {
-                "birthDate": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "oib": {
-                    "type": "string"
-                },
                 "policeToken": {
                     "type": "string"
                 },
-                "residence": {
+                "role": {
                     "type": "string"
                 },
-                "role": {
+                "username": {
                     "type": "string"
                 },
                 "uuid": {

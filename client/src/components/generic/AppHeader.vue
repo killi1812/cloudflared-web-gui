@@ -2,7 +2,7 @@
   <v-app-bar color="primary" :elevation="8" height="60">
     <v-app-bar-nav-icon class="text-white" @click="open = !open"></v-app-bar-nav-icon>
     <img id="logo" src="../../assets/logo.png" alt="logo" />
-    <v-app-bar-title>Mahjong</v-app-bar-title>
+    <v-app-bar-title>Cloudflared web</v-app-bar-title>
     <v-spacer></v-spacer>
     <v-btn icon @click="router.back()">
       <v-icon>mdi-arrow-left</v-icon>
@@ -42,9 +42,6 @@
       </IconListItem>
       <IconListItem to="/help/about" icon="mdi-information" tooltip-text="START.ABOUT" :show-tooltip="!open">
         ABOUT
-      </IconListItem>
-      <IconListItem to="/help/test" icon="mdi-information" tooltip-text="START.TEST" :show-tooltip="!open">
-        TEST
       </IconListItem>
     </v-list>
   </v-navigation-drawer>
