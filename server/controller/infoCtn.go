@@ -35,7 +35,7 @@ func (cnt *InfoCtn) RegisterEndpoints(router *gin.RouterGroup) {
 //	@Summary		Get server info
 //	@Description	return information about the server build, version, etc ...
 //	@Tags			info
-//	@Produce		image/png
+//	@Produce		json
 //	@Success		200	{struct}	dto.ServerInfoDto	"Information about server"
 //	@Router			/info [get]
 func (ctn *InfoCtn) getServerInfo(c *gin.Context) {

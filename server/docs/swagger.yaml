@@ -1,14 +1,14 @@
 definitions:
   dto.LoginDto:
     properties:
-      email:
-        type: string
       password:
         minLength: 6
         type: string
+      username:
+        type: string
     required:
-    - email
     - password
+    - username
     type: object
   dto.NewUserDto:
     properties:
@@ -103,7 +103,7 @@ paths:
     get:
       description: return information about the server build, version, etc ...
       produces:
-      - image/png
+      - application/json
       responses:
         "200":
           description: Information about server
@@ -112,6 +112,55 @@ paths:
       summary: Get server info
       tags:
       - info
+  /tunnel:
+    get:
+      description: returns a list of all tunnels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of tunnels
+          schema:
+            type: struct
+      summary: Get a list of all tunnels
+      tags:
+      - tunnel
+    post:
+      description: creates a new tunnel with given name and returns it
+      parameters:
+      - description: tunnel name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Newly created tunnel
+          schema:
+            type: struct
+      summary: creates a new tunnel
+      tags:
+      - tunnel
+  /tunnel/{id}:
+    delete:
+      description: returns a list of all tunnels
+      parameters:
+      - description: tunnel id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Tunnel deleted
+      summary: Get a list of all tunnels
+      tags:
+      - tunnel
   /user:
     post:
       parameters:

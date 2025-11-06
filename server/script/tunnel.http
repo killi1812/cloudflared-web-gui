@@ -1,0 +1,41 @@
+# @name user
+#
+# Requests for the User controller
+
+# This file assumes you have already run the 'login' request from 'auth.http'
+# to populate the {{accessToken}} variable.
+
+@host = http://localhost
+@port = 8090
+
+# --- Variables for testing ---
+@uuid_to_test = 1f357445-6f3c-490e-a3da-5ed1f18a117a
+
+###
+# @name createUser
+# Create a new user.
+POST {{host}}:{{port}}/api/tunnel
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "test"
+}
+# @lang=lua
+> {%
+  local json = vim.json.decode(response.body)
+  client.global.set("uuid_to_test", json.uuid);
+%}
+
+
+###
+# @name getMyData
+# Get the data for the currently logged-in user.
+GET {{host}}:{{port}}/api/tunnel
+Authorization: Bearer {{accessToken}}
+
+###
+# @name getUserByUuid
+# Get a specific user by their UUID.
+DELETE {{host}}:{{port}}/api/tunnel/{{uuid_to_test}}
+Authorization: Bearer {{accessToken}}

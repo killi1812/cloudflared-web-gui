@@ -19,13 +19,14 @@ func main() {
 	// Provide logger
 	app.Provide(zap.S)
 
-	app.Provide(service.NewDiscordService)
 	app.Provide(service.NewUserCrudService)
 	app.Provide(service.NewAuthService)
+	app.Provide(service.NewTunelSrv)
 
 	app.RegisterController(controller.NewInfoCnt)
 	app.RegisterController(controller.NewUserCtn)
 	app.RegisterController(controller.NewAuthCtn)
+	app.RegisterController(controller.NewTunnelCtn)
 
 	seed.Insert()
 

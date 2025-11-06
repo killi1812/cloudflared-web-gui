@@ -82,7 +82,7 @@
             "get": {
                 "description": "return information about the server build, version, etc ...",
                 "produces": [
-                    "image/png"
+                    "application/json"
                 ],
                 "tags": [
                     "info"
@@ -94,6 +94,81 @@
                         "schema": {
                             "type": "struct"
                         }
+                    }
+                }
+            }
+        },
+        "/tunnel": {
+            "get": {
+                "description": "returns a list of all tunnels",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "Get a list of all tunnels",
+                "responses": {
+                    "200": {
+                        "description": "List of tunnels",
+                        "schema": {
+                            "type": "struct"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "creates a new tunnel with given name and returns it",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "creates a new tunnel",
+                "parameters": [
+                    {
+                        "description": "tunnel name",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Newly created tunnel",
+                        "schema": {
+                            "type": "struct"
+                        }
+                    }
+                }
+            }
+        },
+        "/tunnel/{id}": {
+            "delete": {
+                "description": "returns a list of all tunnels",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tunnel"
+                ],
+                "summary": "Get a list of all tunnels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tunnel id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tunnel deleted"
                     }
                 }
             }
@@ -397,16 +472,16 @@
         "dto.LoginDto": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "password",
+                "username"
             ],
             "properties": {
-                "email": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string",
                     "minLength": 6
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
