@@ -16,8 +16,11 @@
       </template>
       <v-list>
         <IconListItem to="/me/myProfile" icon="mdi-account">
-          MY_PROFILE
+          MY PROFILE
         </IconListItem>
+        <v-list-item prepend-icon="mdi-logout" @click="handleLogout()">
+          Logout
+        </v-list-item>
       </v-list>
     </v-menu>
   </v-app-bar>
@@ -50,9 +53,23 @@
 
 
 <script lang="ts" setup>
+import { logout } from '@/api/auth';
+import { useSnackbar } from './snackbarProvider.vue';
+
 
 const open = ref(false)
 const router = useRouter()
+const snackbar = useSnackbar()
+
+
+async function handleLogout() {
+  const rez = await logout()
+  if (rez) {
+    await router.push("/login")
+    return
+  }
+  snackbar.Error("Failed to login")
+}
 
 </script>
 <style lang="css" scoped>

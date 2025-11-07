@@ -30,35 +30,47 @@
           <template #default>
             <v-icon icon="mdi-tunnel" start class="mr-3"></v-icon>
             <span class="font-weight-medium">{{ tunnel.name }}</span>
-            <v-chip size="small" variant="tonal" class="ml-4" prepend-icon="mdi-clock-outline">
+            <v-chip variant="tonal" class="ml-4" prepend-icon="mdi-clock-outline">
               Created: {{ tunnel.created_at }}
             </v-chip>
+
+            <v-chip v-if="tunnel.isRunning" variant="tonal" class="ml-4" color="success">
+              Running
+            </v-chip>
+            <v-chip v-else variant="tonal" class="ml-4" color="error">
+              Stopped
+            </v-chip>
+
             <v-spacer></v-spacer>
 
             <!-- Control Buttons -->
             <div class="mr-2" @click.stop>
+
               <v-tooltip location="top" text="Start Tunnel">
                 <template #activator="{ props }">
                   <v-btn v-bind="props" icon="mdi-play-circle" color="success" variant="text" size="small"
-                    :disabled="isLoading" @click="handleStart(tunnel)"></v-btn>
+                    :disabled="isLoading || tunnel.isRunning" @click="handleStart(tunnel)"></v-btn>
                 </template>
               </v-tooltip>
+
               <v-tooltip location="top" text="Stop Tunnel">
                 <template #activator="{ props }">
                   <v-btn v-bind="props" icon="mdi-stop-circle" color="warning" variant="text" size="small"
-                    :disabled="isLoading" @click="handleStop(tunnel)"></v-btn>
+                    :disabled="isLoading || !tunnel.isRunning" @click="handleStop(tunnel)"></v-btn>
                 </template>
               </v-tooltip>
+
               <v-tooltip location="top" text="Restart Tunnel">
                 <template #activator="{ props }">
                   <v-btn v-bind="props" icon="mdi-refresh" color="info" variant="text" size="small"
-                    :disabled="isLoading" @click="handleRestart(tunnel)"></v-btn>
+                    :disabled="isLoading || !tunnel.isRunning" @click="handleRestart(tunnel)"></v-btn>
                 </template>
               </v-tooltip>
+
               <v-tooltip location="top" text="Delete Tunnel">
                 <template #activator="{ props }">
                   <v-btn v-bind="props" icon="mdi-delete" color="error" variant="text" size="small"
-                    :disabled="isLoading" @click="openDeleteDialog(tunnel)"></v-btn>
+                    :disabled="isLoading || tunnel.isRunning" @click="openDeleteDialog(tunnel)"></v-btn>
                 </template>
               </v-tooltip>
             </div>
@@ -166,6 +178,7 @@ import { ref, onMounted } from 'vue';
 import * as tunnelApi from '@/api/tunnel';
 // Import the type definition
 import type { tunnel } from '@/models/tunnel';
+import { useSnackbar } from '../generic/snackbarProvider.vue';
 
 // State
 const tunnels = ref<tunnel[] | null>(null);
@@ -180,6 +193,8 @@ const deleteDialog = ref(false);
 
 const createDnsDialog = ref(false);
 const newDnsDomain = ref("");
+
+const snackbar = useSnackbar()
 
 // --- Data Fetching ---
 
@@ -202,23 +217,38 @@ onMounted(loadTunnels);
 
 async function handleStart(tunnel: tunnel) {
   isLoading.value = true;
-  console.log(`Starting tunnel ${tunnel.name}...`);
-  await tunnelApi.startTunnel(tunnel.id);
-  // TODO: Add snackbar for success/error
+  const rez = await tunnelApi.startTunnel(tunnel.id);
+  if (rez) {
+    snackbar.Success(`Started tunnel ${tunnel.name}`)
+    tunnel.isRunning = true
+  } else {
+    snackbar.Error(`Failed to start tunnel ${tunnel.name}`)
+    tunnel.isRunning = false
+  }
   isLoading.value = false;
 }
 
 async function handleStop(tunnel: tunnel) {
   isLoading.value = true;
-  console.log(`Stopping tunnel ${tunnel.name}...`);
-  await tunnelApi.stopTunnel(tunnel.id);
+  const rez = await tunnelApi.stopTunnel(tunnel.id);
+  if (rez) {
+    snackbar.Success(`Stopped tunnel ${tunnel.name}`)
+    tunnel.isRunning = false
+  } else {
+    snackbar.Error(`Failed to stop tunnel ${tunnel.name}`)
+  }
   isLoading.value = false;
 }
 
 async function handleRestart(tunnel: tunnel) {
   isLoading.value = true;
-  console.log(`Restarting tunnel ${tunnel.name}...`);
-  await tunnelApi.restartTunnel(tunnel.id);
+  const rez = await tunnelApi.restartTunnel(tunnel.id);
+  if (rez) {
+    snackbar.Success(`Restarted tunnel ${tunnel.name}`)
+    tunnel.isRunning = true
+  } else {
+    snackbar.Error(`Failed to Restart tunnel ${tunnel.name}`)
+  }
   isLoading.value = false;
 }
 

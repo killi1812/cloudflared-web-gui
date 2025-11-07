@@ -17,9 +17,11 @@ import (
 )
 
 type (
-	nameDto   struct{ name string }
+	nameDto struct {
+		Name string `json:"name" binding:"required"`
+	}
 	domainDto struct {
-		Domain string `json:"domain" binding:"required`
+		Domain string `json:"domain" binding:"required"`
 	}
 )
 
@@ -116,7 +118,7 @@ func (ctn *TunnelCtn) createTunnel(c *gin.Context) {
 		return
 	}
 
-	tunnel, err := ctn.TunnelSrv.Create(req.name)
+	tunnel, err := ctn.TunnelSrv.Create(req.Name)
 	if err != nil {
 		ctn.Logger.Errorf("Error creating a tunnel, err = %v", err)
 		c.AbortWithStatus(http.StatusInternalServerError)

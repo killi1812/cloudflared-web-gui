@@ -13,6 +13,6 @@
 
 <script lang="ts" setup>
 const router = useRouter()
-const isLoggedIn = computed(() => router.currentRoute.value.fullPath != "/login")
+const isLoggedIn = computed(() => (router.currentRoute.value.fullPath != "/login") && (router.currentRoute.value.fullPath != "/"))
 //
 </script>

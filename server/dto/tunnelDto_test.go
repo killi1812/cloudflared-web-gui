@@ -32,6 +32,7 @@ func TestTunnelDto_FromModel(t *testing.T) {
 	mockTunnel := model.Tunnel{
 		Id:        testUUID,
 		Name:      "my-test-tunnel",
+		IsRunning: true,
 		CreatedAt: testTime,
 		DeletedAt: testTime,
 	}
@@ -46,6 +47,7 @@ func TestTunnelDto_FromModel(t *testing.T) {
 	assert.Equal(t, "my-test-tunnel", dto.Name)
 	assert.Equal(t, "2025-11-07 10:30:00", dto.CreatedAt)
 	assert.Equal(t, "2025-11-07 10:30:00", dto.DeletedAt)
+	assert.True(t, dto.IsRunning)
 	assert.Empty(t, dto.DnsRecords) // Ensure DNS records are not unexpectedly populated
 }
 

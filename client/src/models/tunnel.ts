@@ -1,6 +1,7 @@
 export interface tunnel {
   id: string
   name: string
+  isRunning: boolean
   dnsRecords: dnsRecord[]
   created_at: string
   deleted_at: string

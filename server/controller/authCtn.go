@@ -39,7 +39,7 @@ func (ctn *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
 	// register Endpoints
 	group.POST("/login", ctn.login)
 	group.POST("/refresh", auth.Protect(), ctn.refreshToken)
-	group.POST("/logout", auth.Protect(), ctn.logout)
+	group.POST("/logout", ctn.logout)
 }
 
 // Login godoc
@@ -106,7 +106,7 @@ func (ctn *AuthCtn) logout(c *gin.Context) {
 	_, claims, err := auth.ParseToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		ctn.logger.Errorf("Logout failed err = %w", err)
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 

@@ -11,6 +11,7 @@ type Tunnel struct {
 	Name        string       `json:"name"`
 	Connections []Connection `json:"connections"`
 	Token       string       `json:"token,omitempty"`
+	IsRunning   bool         `json:"isRunning"`
 
 	CreatedAt time.Time `json:"created_at"`
 	DeletedAt time.Time `json:"deleted_at"`

@@ -19,4 +19,8 @@ var (
 	ErrBadRole                 = errors.New("role is not allowed")
 	ErrCloudflaredApiKeyNotSet = errors.New("cloudflared api key not set")
 	ErrZoneIdNotSet            = errors.New("zone id not set")
+	ErrProcessNotFound         = errors.New("process not found")
+	ErrNameIsEmpty             = errors.New("name is empty")
+	ErrTunnelNotRunning        = errors.New("tunnel not running")
+	ErrTunnelAlreadyRunning    = errors.New("tunnel already running")
 )

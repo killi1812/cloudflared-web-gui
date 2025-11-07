@@ -9,8 +9,7 @@
 @port = 8090
 
 # --- Variables for testing ---
-@uuid_to_test = 1f357445-6f3c-490e-a3da-5ed1f18a117a
-
+@uuid_to_test = 0e515a3a-8e97-441d-979c-abc0017e9819
 ###
 # @name createTunnel
 # Create a new tunnel

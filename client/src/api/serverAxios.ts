@@ -20,7 +20,6 @@ const serverApi = axios.create({
 serverApi.interceptors.request.use(
   (config) => {
     const authStore = useAppStore();
-    console.log(authStore.authToken)
     if (authStore.authToken !== "") {
       config.headers = config.headers || {};
       config.headers['Authorization'] = `Bearer ${authStore.authToken}`;

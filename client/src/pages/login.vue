@@ -4,8 +4,8 @@
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field v-model="username" density="compact" placeholder="Username" type="text"
-        prepend-inner-icon="mdi-account-outline" variant="outlined" :error-messages="emailError ? [emailError] : []"
-        @focus="emailError = ''"></v-text-field>
+        prepend-inner-icon="mdi-account-outline" variant="outlined"
+        :error-messages="usernameError ? [usernameError] : []" @focus="usernameError = ''"></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
         Password
@@ -39,10 +39,9 @@ const snackbar = useSnackbar()
 
 const username = ref('');
 const password = ref('');
-const emailError = ref('');
+const usernameError = ref('');
 const passwordError = ref('');
 const visible = ref(false);
-const tosAccepted = ref(false);
 
 const loading = ref(false)
 
@@ -50,7 +49,7 @@ const validateForm = () => {
   let isValid = true;
 
   if (!username.value.trim()) {
-    emailError.value = 'E-mail is required';
+    usernameError.value = 'Username is required';
     isValid = false;
   }
 

@@ -7,7 +7,7 @@ import { useAppStore } from '@/stores/app'
 const router = useRouter()
 const app = useAppStore()
 
-onMounted(async () => {
+onBeforeMount(async () => {
   if (app.authToken == "")
     await router.replace("/login")
   else

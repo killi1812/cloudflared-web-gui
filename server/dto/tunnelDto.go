@@ -9,6 +9,7 @@ type TunnelDto struct {
 	Id         string          `json:"id"`
 	Name       string          `json:"name"`
 	DnsRecords ArrDnsRecordDto `json:"dnsRecords"`
+	IsRunning  bool            `json:"isRunning"`
 
 	CreatedAt string `json:"created_at"`
 	DeletedAt string `json:"deleted_at"`
@@ -17,6 +18,7 @@ type TunnelDto struct {
 func (t *TunnelDto) FromModel(tnl model.Tunnel) {
 	t.Id = tnl.Id.String()
 	t.Name = tnl.Name
+	t.IsRunning = tnl.IsRunning
 	t.CreatedAt = tnl.CreatedAt.Format(format.DateTimeFormat)
 	t.DeletedAt = tnl.DeletedAt.Format(format.DateTimeFormat)
 }

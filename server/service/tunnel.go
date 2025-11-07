@@ -3,13 +3,13 @@ package service
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"os"
 	"os/exec"
 
 	"github.com/google/uuid"
 	"github.com/killi1812/cloudflared-web-gui/app"
 	"github.com/killi1812/cloudflared-web-gui/model"
+	"github.com/killi1812/cloudflared-web-gui/util/cerror"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -51,6 +51,7 @@ type TunnelSrv struct {
 	db         *gorm.DB
 	logger     *zap.SugaredLogger
 	tunnelProc map[uuid.UUID]*os.Process // tunnelPid is a map with [Key] tunnel id and [Value] *os.process
+	// TODO: check if mutex is needed
 }
 
 // Info implements ITunnelSrv.
@@ -69,6 +70,8 @@ func (t *TunnelSrv) Info(uuid uuid.UUID) (*model.Tunnel, error) {
 		t.logger.Errorf("Error decoding data, err = %w", err)
 		return nil, err
 	}
+
+	_, tunnel.IsRunning = t.tunnelProc[uuid]
 
 	return &tunnel, nil
 }
@@ -107,7 +110,7 @@ func (t *TunnelSrv) Restart(uuid uuid.UUID) error {
 	oldProc, ok := t.tunnelProc[uuid]
 	if !ok {
 		zap.S().Infof("Tunnel uuid = %s isn't running", uuid)
-		return errors.New("tunnel not running")
+		return cerror.ErrTunnelNotRunning
 	}
 
 	t.logger.Infof("Old process found, pid = %d", oldProc.Pid)
@@ -150,7 +153,7 @@ func (t *TunnelSrv) Start(uuid uuid.UUID) error {
 	_, ok := t.tunnelProc[uuid]
 	if ok {
 		zap.S().Infof("Tunnel uuid = %s already running", uuid)
-		return errors.New("tunnel already running")
+		return cerror.ErrTunnelAlreadyRunning
 	}
 
 	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, _OUTPUT, "run", uuid.String())
@@ -170,7 +173,7 @@ func (t *TunnelSrv) Stop(uuid uuid.UUID) error {
 	proc, ok := t.tunnelProc[uuid]
 	if !ok {
 		t.logger.Errorf("process running a tunnel %s not found", uuid.String())
-		return errors.New("process not found")
+		return cerror.ErrProcessNotFound
 	}
 
 	err := proc.Kill()
@@ -192,6 +195,10 @@ func (t *TunnelSrv) Stop(uuid uuid.UUID) error {
 // Create implements ITunnelSrv.
 // runs and parses ❯ cloudflared tunnel create [name]
 func (t *TunnelSrv) Create(name string) (*model.Tunnel, error) {
+	if name == "" {
+		return nil, cerror.ErrNameIsEmpty
+	}
+
 	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, "create", _OUTPUT, name)
 	data, err := cmd.Output()
 	if err != nil {
@@ -212,7 +219,7 @@ func (t *TunnelSrv) Create(name string) (*model.Tunnel, error) {
 
 // Delete implements ITunnelSrv.
 func (t *TunnelSrv) Delete(uuid uuid.UUID) error {
-	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, "delete", _OUTPUT, uuid.String())
+	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, "delete", uuid.String())
 	err := cmd.Run()
 	if err != nil {
 		checkErr(err)
@@ -239,6 +246,10 @@ func (t *TunnelSrv) List() ([]model.Tunnel, error) {
 	if err != nil {
 		t.logger.Errorf("Error decoding data, err = %w", err)
 		return nil, err
+	}
+
+	for i := range list {
+		_, list[i].IsRunning = t.tunnelProc[list[i].Id]
 	}
 
 	return list, nil
