@@ -21,6 +21,8 @@ declare module 'vue-router/auto-routes' {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/help/about': RouteRecordInfo<'/help/about', '/help/about', Record<never, never>, Record<never, never>>,
     '/help/help': RouteRecordInfo<'/help/help', '/help/help', Record<never, never>, Record<never, never>>,
+    '/home/dashboard': RouteRecordInfo<'/home/dashboard', '/home/dashboard', Record<never, never>, Record<never, never>>,
+    '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/me/myProfile': RouteRecordInfo<'/me/myProfile', '/me/myProfile', Record<never, never>, Record<never, never>>,
   }
 
@@ -45,6 +47,14 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/help/help.vue': {
       routes: '/help/help'
+      views: never
+    }
+    'src/pages/home/dashboard.vue': {
+      routes: '/home/dashboard'
+      views: never
+    }
+    'src/pages/login.vue': {
+      routes: '/login'
       views: never
     }
     'src/pages/me/myProfile.vue': {

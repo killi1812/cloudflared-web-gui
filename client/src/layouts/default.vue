@@ -1,16 +1,18 @@
 <template>
   <div>
-    <AppHeader />
-    <v-main>
-      <router-view v-slot="{ Component, route }">
-        <v-scroll-x-transition>
+    <AppHeader v-if="isLoggedIn" />
+    <SnackbarProvider>
+      <v-main>
+        <router-view v-slot="{ Component, route }">
           <component :is="Component" :key="route" />
-        </v-scroll-x-transition>
-      </router-view>
-    </v-main>
+        </router-view>
+      </v-main>
+    </SnackbarProvider>
   </div>
 </template>
 
 <script lang="ts" setup>
+const router = useRouter()
+const isLoggedIn = computed(() => router.currentRoute.value.fullPath != "/login")
 //
 </script>

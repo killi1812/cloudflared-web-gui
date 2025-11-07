@@ -6,6 +6,34 @@ definitions:
     type: object
   controller.nameDto:
     type: object
+  dto.DnsRecordDto:
+    properties:
+      commnet:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      meta: {}
+      modified_on:
+        type: string
+      name:
+        type: string
+      proxiable:
+        type: boolean
+      proxied:
+        type: boolean
+      settings: {}
+      tags:
+        items: {}
+        type: array
+      ttl:
+        type: integer
+      type:
+        type: string
+    type: object
   dto.LoginDto:
     properties:
       password:
@@ -55,6 +83,21 @@ definitions:
       accessToken:
         type: string
     type: object
+  dto.TunnelDto:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      dnsRecords:
+        items:
+          $ref: '#/definitions/dto.DnsRecordDto'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   dto.UserDto:
     properties:
       policeToken:
@@ -64,25 +107,6 @@ definitions:
       username:
         type: string
       uuid:
-        type: string
-    type: object
-  model.Connection:
-    type: object
-  model.Tunnel:
-    properties:
-      connections:
-        items:
-          $ref: '#/definitions/model.Connection'
-        type: array
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      token:
         type: string
     type: object
 info:
@@ -159,7 +183,7 @@ paths:
           description: List of tunnels
           schema:
             items:
-              $ref: '#/definitions/model.Tunnel'
+              $ref: '#/definitions/dto.TunnelDto'
             type: array
       summary: Get a list of all tunnels
       tags:
@@ -179,7 +203,7 @@ paths:
         "201":
           description: Newly created tunnel
           schema:
-            $ref: '#/definitions/model.Tunnel'
+            $ref: '#/definitions/dto.TunnelDto'
       summary: creates a new tunnel
       tags:
       - tunnel
@@ -214,7 +238,7 @@ paths:
         "200":
           description: Tunnel dns record created
           schema:
-            $ref: '#/definitions/model.Tunnel'
+            $ref: '#/definitions/dto.TunnelDto'
       summary: Creates a dns record on the tunnel
       tags:
       - tunnel
@@ -273,7 +297,7 @@ paths:
         "201":
           description: Tunnel dns record created
           schema:
-            $ref: '#/definitions/model.Tunnel'
+            $ref: '#/definitions/dto.TunnelDto'
       summary: Creates a dns record on the tunnel
       tags:
       - tunnel

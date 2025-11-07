@@ -29,7 +29,7 @@
       <v-list-item v-show="open" readonly>INFORMATION</v-list-item>
       <v-divider></v-divider>
       <!-- Navigations -->
-      <IconListItem to="/" icon="mdi-home" tooltip-text="START.DASHBOARD" :show-tooltip="!open">
+      <IconListItem to="/home/dashboard" icon="mdi-home" tooltip-text="START.DASHBOARD" :show-tooltip="!open">
         HOME
       </IconListItem>
       <!-- Master Data section -->

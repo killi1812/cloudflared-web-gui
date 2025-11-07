@@ -103,7 +103,7 @@ func (ctn *TunnelCtn) getTunnels(c *gin.Context) {
 //	@Description	creates a new tunnel with given name and returns it
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		201		{object}	model.Tunnel	"Newly created tunnel"
+//	@Success		201		{object}	dto.TunnelDto	"Newly created tunnel"
 //	@Param			name	body		nameDto			true	"tunnel name"
 //	@Router			/tunnel [post]
 func (ctn *TunnelCtn) createTunnel(c *gin.Context) {
@@ -123,7 +123,10 @@ func (ctn *TunnelCtn) createTunnel(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatusJSON(http.StatusCreated, tunnel)
+	var resp dto.TunnelDto
+	resp.FromModel(*tunnel)
+
+	c.AbortWithStatusJSON(http.StatusCreated, resp)
 }
 
 // getTunnels godoc
@@ -166,7 +169,7 @@ func (ctn *TunnelCtn) deleteTunnel(c *gin.Context) {
 //	@Description	Creates a new dns record on the tunnel
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		201	{object}	model.Tunnel	"Tunnel dns record created"
+//	@Success		201	{object}	dto.TunnelDto	"Tunnel dns record created"
 //	@Param			id	path		string			true	"tunnel id"
 //	@Param			id	body		domainDto		true	"dns domain"
 //	@Router			/tunnel/dns/{id} [post]
@@ -200,8 +203,10 @@ func (ctn *TunnelCtn) createDnsRecord(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+	var resp dto.TunnelDto
+	resp.FromModel(*tunnel)
 
-	c.AbortWithStatusJSON(http.StatusCreated, tunnel)
+	c.AbortWithStatusJSON(http.StatusCreated, resp)
 }
 
 // getInfo godoc
@@ -210,7 +215,7 @@ func (ctn *TunnelCtn) createDnsRecord(c *gin.Context) {
 //	@Description	Creates a new dns record on the tunnel
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		200	{object}	model.Tunnel	"Tunnel dns record created"
+//	@Success		200	{object}	dto.TunnelDto	"Tunnel dns record created"
 //	@Param			id	path		string			true	"tunnel id"
 //	@Router			/tunnel/{id} [get]
 func (ctn *TunnelCtn) getInfo(c *gin.Context) {
@@ -294,7 +299,7 @@ func (ctn *TunnelCtn) startTunnel(c *gin.Context) {
 //	@Produce		json
 //	@Success		204	"Tunnel stopped"
 //	@Param			id	path	string	true	"tunnel id"
-//	@Router			/tunnel/{id}/start [put]
+//	@Router			/tunnel/{id}/stop [put]
 func (ctn *TunnelCtn) stopTunnel(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {

@@ -32,14 +32,14 @@ func NewAuthCtn() app.Controller {
 	return controller
 }
 
-func (c *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
+func (ctn *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
 	// create a group with the name of the router
 	group := api.Group("/auth")
 
 	// register Endpoints
-	group.POST("/login", c.login)
-	group.POST("/refresh", auth.Protect(), c.refreshToken)
-	group.POST("/logout", auth.Protect(), c.logout)
+	group.POST("/login", ctn.login)
+	group.POST("/refresh", auth.Protect(), ctn.refreshToken)
+	group.POST("/logout", auth.Protect(), ctn.logout)
 }
 
 // Login godoc
@@ -52,17 +52,17 @@ func (c *AuthCtn) RegisterEndpoints(api *gin.RouterGroup) {
 //	@Param			loginDto	body		dto.LoginDto	true	"Login credentials"
 //	@Success		200			{object}	dto.TokenDto
 //	@Router			/auth/login [post]
-func (l *AuthCtn) login(c *gin.Context) {
+func (ctn *AuthCtn) login(c *gin.Context) {
 	var loginDto dto.LoginDto
 
 	if err := c.BindJSON(&loginDto); err != nil {
-		l.logger.Errorf("Invalid login request err = %+v", err)
+		ctn.logger.Errorf("Invalid login request err = %+v", err)
 		return
 	}
 
-	accessToken, err := l.auth.Login(loginDto.Username, loginDto.Password)
+	accessToken, err := ctn.auth.Login(loginDto.Username, loginDto.Password)
 	if err != nil {
-		l.logger.Errorf("Login failed err = %+v", err)
+		ctn.logger.Errorf("Login failed err = %+v", err)
 		c.JSON(http.StatusUnauthorized, err.Error())
 		return
 	}
@@ -80,11 +80,11 @@ func (l *AuthCtn) login(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	dto.TokenDto
 //	@Router			/auth/refresh [post]
-func (l *AuthCtn) refreshToken(c *gin.Context) {
+func (ctn *AuthCtn) refreshToken(c *gin.Context) {
 	tokenStr := c.Request.Header.Get("Authorization")
-	token, err := l.auth.RefreshTokens(tokenStr)
+	token, err := ctn.auth.RefreshTokens(tokenStr)
 	if err != nil {
-		l.logger.Errorf("Refresh failed err = %w", err)
+		ctn.logger.Errorf("Refresh failed err = %w", err)
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -102,17 +102,17 @@ func (l *AuthCtn) refreshToken(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	dto.TokenDto
 //	@Router			/auth/logout [post]
-func (l *AuthCtn) logout(c *gin.Context) {
+func (ctn *AuthCtn) logout(c *gin.Context) {
 	_, claims, err := auth.ParseToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		l.logger.Errorf("Logout failed err = %w", err)
+		ctn.logger.Errorf("Logout failed err = %w", err)
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	err = l.auth.Logout(claims.ID)
+	err = ctn.auth.Logout(claims.ID)
 	if err != nil {
-		l.logger.Errorf("Logout failed err = %w", err)
+		ctn.logger.Errorf("Logout failed err = %w", err)
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

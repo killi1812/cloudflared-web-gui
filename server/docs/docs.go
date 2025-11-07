@@ -125,7 +125,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Tunnel"
+                                "$ref": "#/definitions/dto.TunnelDto"
                             }
                         }
                     }
@@ -155,7 +155,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Newly created tunnel",
                         "schema": {
-                            "$ref": "#/definitions/model.Tunnel"
+                            "$ref": "#/definitions/dto.TunnelDto"
                         }
                     }
                 }
@@ -193,7 +193,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Tunnel dns record created",
                         "schema": {
-                            "$ref": "#/definitions/model.Tunnel"
+                            "$ref": "#/definitions/dto.TunnelDto"
                         }
                     }
                 }
@@ -222,7 +222,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Tunnel dns record created",
                         "schema": {
-                            "$ref": "#/definitions/model.Tunnel"
+                            "$ref": "#/definitions/dto.TunnelDto"
                         }
                     }
                 }
@@ -611,6 +611,47 @@ const docTemplate = `{
         "controller.nameDto": {
             "type": "object"
         },
+        "dto.DnsRecordDto": {
+            "type": "object",
+            "properties": {
+                "commnet": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "meta": {},
+                "modified_on": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "proxiable": {
+                    "type": "boolean"
+                },
+                "proxied": {
+                    "type": "boolean"
+                },
+                "settings": {},
+                "tags": {
+                    "type": "array",
+                    "items": {}
+                },
+                "ttl": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.LoginDto": {
             "type": "object",
             "required": [
@@ -682,6 +723,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.TunnelDto": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "dnsRecords": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DnsRecordDto"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserDto": {
             "type": "object",
             "properties": {
@@ -695,35 +759,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Connection": {
-            "type": "object"
-        },
-        "model.Tunnel": {
-            "type": "object",
-            "properties": {
-                "connections": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Connection"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "token": {
                     "type": "string"
                 }
             }
