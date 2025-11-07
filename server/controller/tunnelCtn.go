@@ -1,12 +1,16 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/killi1812/cloudflared-web-gui/app"
+	"github.com/killi1812/cloudflared-web-gui/dto"
 	"github.com/killi1812/cloudflared-web-gui/service"
 	"github.com/killi1812/cloudflared-web-gui/util/auth"
+	"github.com/killi1812/cloudflared-web-gui/util/cerror"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -19,21 +23,23 @@ type (
 	}
 )
 
-type TunnelCtn struct {
-	Logger    *zap.SugaredLogger
-	TunnelSrv service.ITunnelSrv
-}
-
 // NewImageCnt creates a new controller for images.
 func NewTunnelCtn() app.Controller {
 	var controller *TunnelCtn
-	app.Invoke(func(logger *zap.SugaredLogger, srv service.ITunnelSrv) {
+	app.Invoke(func(logger *zap.SugaredLogger, srv service.ITunnelSrv, dns service.IDnsSrv) {
 		controller = &TunnelCtn{
 			Logger:    logger,
 			TunnelSrv: srv,
+			DndSrv:    dns,
 		}
 	})
 	return controller
+}
+
+type TunnelCtn struct {
+	Logger    *zap.SugaredLogger
+	TunnelSrv service.ITunnelSrv
+	DndSrv    service.IDnsSrv
 }
 
 // RegisterEndpoints registers the image manipulation endpoints.
@@ -58,7 +64,7 @@ func (cnt *TunnelCtn) RegisterEndpoints(router *gin.RouterGroup) {
 //	@Description	returns a list of all tunnels
 //	@Tags			tunnel
 //	@Produce		json
-//	@Success		200	{object}	[]model.Tunnel	"List of tunnels"
+//	@Success		200	{object}	[]dto.TunnelDto	"List of tunnels"
 //	@Router			/tunnel [get]
 func (ctn *TunnelCtn) getTunnels(c *gin.Context) {
 	list, err := ctn.TunnelSrv.List()
@@ -68,7 +74,27 @@ func (ctn *TunnelCtn) getTunnels(c *gin.Context) {
 		return
 	}
 
-	c.AbortWithStatusJSON(http.StatusOK, list)
+	var resp []dto.TunnelDto = make([]dto.TunnelDto, len(list))
+	var wg sync.WaitGroup
+
+	for i, tnl := range list {
+		wg.Go(func() {
+			resp[i].FromModel(tnl)
+			dnsRecords, err := ctn.DndSrv.GetDnsRecords(tnl.Id)
+			if err != nil {
+				if !errors.Is(err, cerror.ErrZoneIdNotSet) && !errors.Is(err, cerror.ErrCloudflaredApiKeyNotSet) {
+					ctn.Logger.Warnln(err)
+				} else {
+					ctn.Logger.Errorf("Error Dns Records for tunnel %s, err %v", tnl.Id, err)
+				}
+			} else {
+				resp[i].DnsRecords.FromModel(dnsRecords)
+			}
+		})
+	}
+
+	wg.Wait()
+	c.AbortWithStatusJSON(http.StatusOK, resp)
 }
 
 // getTunnels godoc
@@ -204,12 +230,26 @@ func (ctn *TunnelCtn) getInfo(c *gin.Context) {
 
 	tunnel, err := ctn.TunnelSrv.Info(uuid)
 	if err != nil {
-		ctn.Logger.Errorf("Error deleting a tunnel, err = %v", err)
+		ctn.Logger.Errorf("Error getting tunnel info, id = %s , err = %v", uuid, err)
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	c.AbortWithStatusJSON(http.StatusOK, tunnel)
+	var resp dto.TunnelDto
+	resp.FromModel(*tunnel)
+
+	dnsRecords, err := ctn.DndSrv.GetDnsRecords(tunnel.Id)
+	if err != nil {
+		ctn.Logger.Errorf("Error retrieving tunnel dns records, id = %s, err = %v", tunnel.Id, err)
+		if !errors.Is(err, cerror.ErrZoneIdNotSet) && !errors.Is(err, cerror.ErrCloudflaredApiKeyNotSet) {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+	} else {
+		resp.DnsRecords.FromModel(dnsRecords)
+	}
+
+	c.AbortWithStatusJSON(http.StatusOK, resp)
 }
 
 // startTunnel godoc

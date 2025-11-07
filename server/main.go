@@ -21,6 +21,7 @@ func main() {
 
 	app.Provide(service.NewUserCrudService)
 	app.Provide(service.NewAuthService)
+	app.Provide(service.NewDnsSrv)
 	app.Provide(service.NewTunelSrv)
 
 	app.RegisterController(controller.NewInfoCnt)

@@ -25,6 +25,9 @@ func LoadConfig() {
 	AccessKey = loadString("ACCESS_KEY")
 	RefreshKey = loadString("REFRESH_KEY")
 
+	CloudflaredApiKey = loadString("CLOUDFLARED_API_KEY")
+	ZoneId = loadString("ZONE_ID")
+
 	zap.S().Debugf("Finished loading env variables")
 }
 

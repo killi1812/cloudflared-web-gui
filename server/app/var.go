@@ -21,4 +21,7 @@ var (
 	Port       int    // Port is app port
 	AccessKey  string // AccessKey is secrete for jwt access key
 	RefreshKey string // RefreshKey is secrete for jwt refresh key
+
+	CloudflaredApiKey string
+	ZoneId            string
 )
