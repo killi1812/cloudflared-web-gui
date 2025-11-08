@@ -15,8 +15,7 @@ COPY . .
 
 ARG LDFLAGS
 
-RUN go build -ldflags="${LDFLAGS}" .
-
+RUN go build -ldflags="$LDFLAGS" .
 
 FROM cloudflare/cloudflared:latest
 

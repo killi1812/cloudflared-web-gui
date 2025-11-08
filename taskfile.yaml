@@ -200,7 +200,7 @@ tasks:
         sh: date '+%Y-%m-%dT%H:%M:%S'
       LDFLAGS: "-X '{{.PACKAGE}}/app.Build={{.BUILD}}' -X '{{.PACKAGE}}/app.Version={{.VERSION}}' -X '{{.PACKAGE}}/app.CommitHash={{.COMMIT_HASH}}' -X '{{.PACKAGE}}/app.BuildTimestamp={{.BUILD_TIMESTAMP}}'"
     cmds:
-      - cmd: docker build --tag {{.BIN}}-server --build-arg="{{.LDFLAGS}}" ./
+      - cmd: docker build --tag {{.BIN}}-server --build-arg="LDFLAGS={{.LDFLAGS}}" ./
       - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-server.tar {{.BIN}}-server:latest
     silent: true
     internal: true
