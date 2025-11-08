@@ -35,9 +35,6 @@ services:
       PORT: 8090
     ports:
       - "8099:80"
-    depends_on:
-      - backend:
-        condition: service_healthy
     networks:
       - app-network
 
