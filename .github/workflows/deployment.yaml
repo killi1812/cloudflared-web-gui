@@ -1,0 +1,16 @@
+name: deployment
+
+on:
+  pull_request:
+    types: [closed]
+    branches: ["prod"]
+
+jobs:
+  deployment:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trigger Deploy Webhook
+        run: curl -X POST -d {} https://portainer.francvok.from.hr/api/stacks/webhooks/2765f8e8-a3e8-47bc-9a41-85bb95429d20
