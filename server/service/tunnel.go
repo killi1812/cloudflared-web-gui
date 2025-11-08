@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -18,6 +19,7 @@ const (
 	_CLOUDFLARED = "cloudflared"
 	_TUNNEL      = "tunnel"
 	_OUTPUT      = "--output=json"
+	_CONFIG_FMT  = "--config /config/%s-config.yml"
 )
 
 type ITunnelSrv interface {
@@ -148,7 +150,7 @@ func (t *TunnelSrv) Restart(uuid uuid.UUID) error {
 }
 
 // Start implements ITunnelSrv.
-// runs and parses ❯ cloudflared tunnel run [tunnel id]
+// runs and parses ❯ cloudflared tunnel --config /config/[tunnel id]-config.yml run [tunnel id]
 func (t *TunnelSrv) Start(uuid uuid.UUID) error {
 	_, ok := t.tunnelProc[uuid]
 	if ok {
@@ -156,7 +158,7 @@ func (t *TunnelSrv) Start(uuid uuid.UUID) error {
 		return cerror.ErrTunnelAlreadyRunning
 	}
 
-	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, _OUTPUT, "run", uuid.String())
+	cmd := exec.Command(_CLOUDFLARED, _TUNNEL, fmt.Sprintf(_CONFIG_FMT, uuid.String()), _OUTPUT, "run", uuid.String())
 	err := cmd.Start()
 	if err != nil {
 		checkErr(err)
@@ -213,6 +215,8 @@ func (t *TunnelSrv) Create(name string) (*model.Tunnel, error) {
 		t.logger.Errorf("Error decoding data, err = %w", err)
 		return nil, err
 	}
+
+	// TODO: create config file
 
 	return &tunnel, nil
 }

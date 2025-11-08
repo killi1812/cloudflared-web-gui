@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  backend:
+    image: cldflctn-server:latest
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+      PORT: 8090
+      SUPERADMIN_PASSWORD: Pa$$w0rd
+      ACCESS_KEY: "your-access-key-here"
+      REFRESH_KEY: "your-refresh-key-here"
+      CLOUDFLARED_API_KEY: "key"
+      ZONE_ID: "id"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8090/api/info"]
+      start_period: 1s
+      interval: 5s
+      retries: 3
+      timeout: 5s
+    volumes:
+      - type: bind
+        source: /DATA/AppData/cloudflared-web-gui/config
+        target: /config
+        bind:
+          create_host_path: true
+
+  frontend:
+    image: cldflctn-client:latest
+    container_name: cloudflared-web-gui
+    restart: unless-stopped
+    environment:
+      PORT: 8090
+    ports:
+      - "8099:80"
+    depends_on:
+      - backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

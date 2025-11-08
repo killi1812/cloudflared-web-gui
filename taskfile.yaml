@@ -178,9 +178,18 @@ tasks:
   # |                     |
   # |    Docker build     |
   # |_____________________|
-
   d-build:
     desc: "build a docker images"
+    cmds:
+      - cmd: mkdir -p {{.BINARY_DIR}}
+      - task: d-build-server
+      - task: d-build-client
+
+    silent: true
+
+  d-build-server:
+    desc: "build a docker image for server"
+    dir: ./server
     vars:
       BUILD: "prod"
       VERSION:
@@ -191,24 +200,8 @@ tasks:
         sh: date '+%Y-%m-%dT%H:%M:%S'
       LDFLAGS: "-X '{{.PACKAGE}}/app.Build={{.BUILD}}' -X '{{.PACKAGE}}/app.Version={{.VERSION}}' -X '{{.PACKAGE}}/app.CommitHash={{.COMMIT_HASH}}' -X '{{.PACKAGE}}/app.BuildTimestamp={{.BUILD_TIMESTAMP}}'"
     cmds:
-      - cmd: mkdir -p {{.BINARY_DIR}}
-      - task: d-build-server
-        vars:
-          LDFLAGS: "{{.LDFLAGS}}"
-          VERSION: "{{.VERSION}}"
-          BUILD: "{{.BUILD}}"
-      - task: d-build-client
-        vars:
-          VERSION: "{{.VERSION}}"
-
-    silent: true
-
-  d-build-server:
-    desc: "build a docker image for server"
-    dir: ./server
-    cmds:
-      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} --build-arg="{{.LDFLAGS}}" ./
-      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-server-{{.VERSION}}.tar {{.PACKAGE}}:latest
+      - cmd: docker build --tag {{.BIN}}-server --build-arg="{{.LDFLAGS}}" ./
+      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-server.tar {{.BIN}}-server:latest
     silent: true
     internal: true
 
@@ -217,8 +210,8 @@ tasks:
     dir: ./client
     vars:
     cmds:
-      - cmd: docker build --tag {{.PACKAGE}} --tag {{.VERSION}} ./
-      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-client-{{.VERSION}}.tar {{.PACKAGE}}:latest
+      - cmd: docker build --tag {{.BIN}}-client ./
+      - cmd: docker save -o ../{{.BINARY_DIR}}/{{.BIN}}-client.tar {{.BIN}}-client:latest
     silent: true
     internal: true
 

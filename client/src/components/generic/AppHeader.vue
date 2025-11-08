@@ -1,12 +1,15 @@
 <template>
   <v-app-bar color="primary" :elevation="8" height="60">
-    <v-app-bar-nav-icon class="text-white" @click="open = !open"></v-app-bar-nav-icon>
-    <img id="logo" src="../../assets/logo.png" alt="logo" />
-    <v-app-bar-title>Cloudflared web</v-app-bar-title>
-    <v-spacer></v-spacer>
+
     <v-btn icon @click="router.back()">
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
+
+    <img id="logo" src="../../assets/logo.png" alt="logo" />
+
+    <v-app-bar-title>Cloudflared web</v-app-bar-title>
+
+    <v-spacer></v-spacer>
 
     <v-menu location="bottom">
       <template v-slot:activator="{ props }">
@@ -47,6 +50,20 @@
         ABOUT
       </IconListItem>
     </v-list>
+
+    <template v-slot:append>
+      <v-list>
+        <v-list-item @click="open = !open">
+          <v-icon v-if="open">
+            mdi-arrow-left
+          </v-icon>
+          <v-icon v-else>
+            mdi-arrow-right
+          </v-icon>
+        </v-list-item>
+      </v-list>
+    </template>
+
   </v-navigation-drawer>
 
 </template>
