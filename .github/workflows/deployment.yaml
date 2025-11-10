@@ -13,4 +13,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Trigger Deploy Webhook
-        run: curl -X POST -d {} https://portainer.francvok.from.hr/api/stacks/webhooks/2765f8e8-a3e8-47bc-9a41-85bb95429d20
+        run: curl -X POST -d {} https://portainer.francvok.from.hr/api/stacks/webhooks/9389faef-f70a-4dfa-9973-1c3bc3ae3631
