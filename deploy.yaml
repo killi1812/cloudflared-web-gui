@@ -20,9 +20,11 @@ services:
       interval: 5s
       retries: 3
       timeout: 5s
+    ports:
+      - "8090:80"
     volumes:
       - type: bind
-        source: /DATA/AppData/cloudflared-web-gui/config
+        source: /DATA/cloudflared-web-gui/config
         target: /config
         bind:
           create_host_path: true

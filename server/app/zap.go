@@ -2,11 +2,9 @@ package app
 
 import (
 	"os"
-	"path/filepath"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 const (
@@ -34,38 +32,39 @@ func prodLoggerSetup() error {
 	consoleLogConfig.LevelKey = ""
 
 	consoleLogEncoder := zapcore.NewConsoleEncoder(consoleLogConfig)
+	/*
+		// file log, text
+		// log level
+		fileLogLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
+			return level >= zapcore.InfoLevel
+		})
 
-	// file log, text
-	// log level
-	fileLogLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
-		return level >= zapcore.InfoLevel
-	})
-
-	logPath := filepath.Join(_LOG_FOLDER, _LOG_FILE)
-	lumberjackLogger := lumberjack.Logger{
-		Filename:   logPath,
-		MaxSize:    _LOG_FILE_MAX_SIZE,    // size in MB
-		MaxAge:     _LOG_FILE_MAX_AGE,     // maximum number of days to retain old log files
-		MaxBackups: _LOG_FILE_MAX_BACKUPS, // maximum number of old log files to retain
-		LocalTime:  true,                  // time used for formatting the timestamps
-		Compress:   false,
-	}
-	fileLogFile := zapcore.Lock(zapcore.AddSync(&lumberjackLogger))
-	// log configuration
-	fileLogConfig := zap.NewProductionEncoderConfig()
-	// configure keys
-	fileLogConfig.TimeKey = "timestamp"
-	fileLogConfig.MessageKey = "message"
-	// configure types
-	fileLogConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	fileLogConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	// create encoder
-	fileLogEncoder := zapcore.NewConsoleEncoder(fileLogConfig)
-	// setup zap
-	// duplicate log entries into multiple cores
+		logPath := filepath.Join(_LOG_FOLDER, _LOG_FILE)
+		lumberjackLogger := lumberjack.Logger{
+			Filename:   logPath,
+			MaxSize:    _LOG_FILE_MAX_SIZE,    // size in MB
+			MaxAge:     _LOG_FILE_MAX_AGE,     // maximum number of days to retain old log files
+			MaxBackups: _LOG_FILE_MAX_BACKUPS, // maximum number of old log files to retain
+			LocalTime:  true,                  // time used for formatting the timestamps
+			Compress:   false,
+		}
+		fileLogFile := zapcore.Lock(zapcore.AddSync(&lumberjackLogger))
+		// log configuration
+		fileLogConfig := zap.NewProductionEncoderConfig()
+		// configure keys
+		fileLogConfig.TimeKey = "timestamp"
+		fileLogConfig.MessageKey = "message"
+		// configure types
+		fileLogConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		fileLogConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		// create encoder
+		fileLogEncoder := zapcore.NewConsoleEncoder(fileLogConfig)
+		// setup zap
+		// duplicate log entries into multiple cores
+	*/
 	core := zapcore.NewTee(
 		zapcore.NewCore(consoleLogEncoder, consoleLogFile, consoleLogLevel),
-		zapcore.NewCore(fileLogEncoder, fileLogFile, fileLogLevel),
+		// zapcore.NewCore(fileLogEncoder, fileLogFile, fileLogLevel),
 	)
 
 	// create logger from core
